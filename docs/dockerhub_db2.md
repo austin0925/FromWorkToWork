@@ -15,6 +15,7 @@ DBI1446I  The db2icrt command is running.
 
 
 DBI1070I  Program db2icrt completed successfully.
+
 ```
 
 * 很高興地打開 `dbeaver` 連上 db2，localhost/testdb, db2inst1/password，結果跳出了錯誤訊息`DB2 Connection refused: connect。 ERRORCODE=-4499, SQLSTATE=08001`。去查了一下IBM的官網文件，大概的意思就是請遵循官方文件再次設定，直指防火牆問題。另外因為我是透過docker啟動的，也有人指出是docker network 的問題。因為AP 和 DB 的路由不通，需要透過bridge 設定才能打通。為此我還把docker network 的狀態查詢了一便。但是仍然無解。
@@ -26,12 +27,14 @@ DBI1070I  Program db2icrt completed successfully.
 # 問題處理
 
 * 先查看docker port 是否開放，明顯有`0.0.0.0:50000->50000/tcp`
+
 ```
 CONTAINER ID        IMAGE                 COMMAND                  CREATED             STATUS              POR                                  NAMES
 3ee57359b00d        ibmcom/db2:11.5.0.0   "/var/db2_setup/lib/…"   23 hours ago        Up 10 minutes       22/7/tcp, 0.0.0.0:50000->50000/tcp   mydb2
 ```
 
 * 再查看db2 服務使用的port號, 結果發現新大陸 `db2c_db2inst1      25010/tcp`，甚麼??結果居然開在 25010 !!!!
+
 ```
 [bash] docker exec -it db2server bash -c "su - db2inst1"
 
@@ -47,10 +50,12 @@ db2c_db2inst1      25010/tcp
 * 官方文件寫錯，真的害死人。不過基礎的image可能隨時也會調整，目前發現這個問題是在tag `11.5.6.0`。當然在此建議下，請大家改連 25010。另外應該也不會另外製作 image 去更改 port 設定。如果未來有需要特別把port num 改為 50000的話，可能再透過 image 製作的方式重新啟動服務的 port 號。
 
 * docker startup
+
 ```
 docker run --name db2server --restart=always --detach --privileged=true -p 25010:25010 -p 50000:50000 --env-file .env_list -v $(pwd)/database:/database ibmcom/db2:docker pull ibmcom/db2:11.5.6.0
 ```
 * .evn_list 參考
+
 ```
 LICENSE=accept
 DB2INSTANCE=db2inst1
