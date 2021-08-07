@@ -7,7 +7,7 @@
 
 * 透過 `docker logs db2server`，也看到啟動的過程非常順利。
 
-```
+```sh
 The execution completed successfully.
 
 For more information see the DB2 installation log at "/tmp/db2icrt.log.71".
@@ -28,14 +28,14 @@ DBI1070I  Program db2icrt completed successfully.
 
 * 先查看docker port 是否開放，明顯有`0.0.0.0:50000->50000/tcp`
 
-```
+```sh
 CONTAINER ID        IMAGE                 COMMAND                  CREATED             STATUS              POR                                  NAMES
 3ee57359b00d        ibmcom/db2:11.5.0.0   "/var/db2_setup/lib/…"   23 hours ago        Up 10 minutes       22/7/tcp, 0.0.0.0:50000->50000/tcp   mydb2
 ```
 
 * 再查看db2 服務使用的port號, 結果發現新大陸 `db2c_db2inst1      25010/tcp`，甚麼??結果居然開在 25010 !!!!
 
-```
+```sh
 [bash] docker exec -it db2server bash -c "su - db2inst1"
 
 [db2inst1@3ee57359b00d ~]$ db2 get dbm cfg|grep SVCENAME
@@ -51,12 +51,12 @@ db2c_db2inst1      25010/tcp
 
 * docker startup
 
-```
+```sh
 docker run --name db2server --restart=always --detach --privileged=true -p 25010:25010 -p 50000:50000 --env-file .env_list -v $(pwd)/database:/database ibmcom/db2:docker pull ibmcom/db2:11.5.6.0
 ```
 * .evn_list 參考
 
-```
+```sh
 LICENSE=accept
 DB2INSTANCE=db2inst1
 DB2INST1_PASSWORD=password
