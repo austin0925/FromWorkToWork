@@ -52,7 +52,7 @@ db2c_db2inst1      25010/tcp
 * docker startup
 
 ```sh
-docker run --name db2server --restart=always --detach --privileged=true -p 25010:25010 -p 50000:50000 --env-file .env_list -v $(pwd)/database:/database ibmcom/db2:docker pull ibmcom/db2:11.5.6.0
+docker run --name db2server --restart=always --detach --privileged=true -p 50000:25010 --env-file .env_list -v $(pwd)/database:/database ibmcom/db2:docker pull ibmcom/db2:11.5.6.0
 ```
 * .evn_list 參考
 
